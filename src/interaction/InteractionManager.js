@@ -370,7 +370,7 @@ InteractionManager.prototype.processInteractive = function (point, displayObject
             else
             {
                 // now we know we can miss it all!
-                this.processInteractive(point, children[i], func, false, false );
+                this.processInteractive(point, children[i], func, true, false );
             }
         }
 
@@ -646,6 +646,10 @@ InteractionManager.prototype.processTouchStart = function ( displayObject, hit )
     if(hit)
     {
         displayObject._touchDown = true;
+        
+        // save touch position for tap detection
+        displayObject._touchDownPoint.copy(this.eventData.data.global);
+        
         this.dispatchEvent( displayObject, 'touchstart', this.eventData );
     }
 };
@@ -701,7 +705,13 @@ InteractionManager.prototype.processTouchEnd = function ( displayObject, hit )
         if( displayObject._touchDown )
         {
             displayObject._touchDown = false;
-            this.dispatchEvent( displayObject, 'tap', this.eventData );
+            
+            // calculate the distance since the tap
+            var tapDistance = displayObject._touchDownPoint.distance(this.eventData.data.global);
+                        
+            if (tapDistance < displayObject.tapThreshold) {
+                this.dispatchEvent( displayObject, 'tap', this.eventData );
+            }
         }
     }
     else
@@ -778,6 +788,12 @@ InteractionManager.prototype.getTouchData = function (touchEvent)
 
     touchData.identifier = touchEvent.identifier;
     this.mapPositionToPoint( touchData.global, touchEvent.clientX, touchEvent.clientY );
+
+    if(navigator.isCocoonJS)
+    {
+        touchData.global.x = touchData.global.x / this.resolution;
+        touchData.global.y = touchData.global.y / this.resolution;
+    }
 
     touchEvent.globalX = touchData.global.x;
     touchEvent.globalY = touchData.global.y;

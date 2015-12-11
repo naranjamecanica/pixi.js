@@ -270,8 +270,6 @@ Object.defineProperties(DisplayObject.prototype, {
  * Updates the object transform for rendering
  *
  * TODO - Optimization pass!
- *
- * @private
  */
 DisplayObject.prototype.updateTransform = function ()
 {
@@ -425,15 +423,15 @@ DisplayObject.prototype.renderCanvas = function (renderer) // jshint unused:fals
  * This can be quite useful if your displayObject is static / complicated and needs to be reused multiple times.
  *
  * @param renderer {CanvasRenderer|WebGLRenderer} The renderer used to generate the texture.
- * @param resolution {Number} The resolution of the texture being generated
  * @param scaleMode {Number} See {@link SCALE_MODES} for possible values
+ * @param resolution {Number} The resolution of the texture being generated
  * @return {Texture} a texture of the display object
  */
-DisplayObject.prototype.generateTexture = function (renderer, resolution, scaleMode)
+DisplayObject.prototype.generateTexture = function (renderer, scaleMode, resolution)
 {
     var bounds = this.getLocalBounds();
 
-    var renderTexture = new RenderTexture(renderer, bounds.width | 0, bounds.height | 0, renderer, scaleMode, resolution);
+    var renderTexture = new RenderTexture(renderer, bounds.width | 0, bounds.height | 0, scaleMode, resolution);
 
     _tempMatrix.tx = -bounds.x;
     _tempMatrix.ty = -bounds.y;
